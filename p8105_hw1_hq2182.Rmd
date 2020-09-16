@@ -4,16 +4,17 @@ author: Hanfei Qi
 output: github_document
 ---
 
-This is my solution to HW1.
+This is my solution to HW1.  
+Load the tidyverse first.
 
-```{r}
+```{r load, message = FALSE}
 library(tidyverse)
 ```
 
 
 ## Problem 1
 
-Create a data frame with specific elements
+Create a data frame with specific elements according to hw requirement.
 
 ```{r dataframe}
 prob1_df = 
@@ -23,31 +24,76 @@ prob1_df =
     char_vec = c("a", "b", "c", "d", "e", "f", "g", "h", "i", "j"),
     factor_vec = factor(c("low", "low", "low", "mod", "mod", "mod", "mod", "high", "high", "high"))
 )
+
+# Display the table
+prob1_df
 ```
 
-Take the mean of each variable in my data frame.
+Take the mean of each variable in my data frame.  
+The warning will not be displayed.
 
-```{r}
+```{r, warning = FALSE}
 mean(pull(prob1_df, samp))
 mean(pull(prob1_df, samp_gt_10))
 mean(pull(prob1_df, char_vec))
 mean(pull(prob1_df, factor_vec))
 ```
 
-I can take the mean of numbers and logical but not character or factor.
+Conclusion: I can take the mean of numbers and logical but not character or factor.  
 
-```{r}
-as.numeric(pull(prob1_df, samp))
+Try to convert the logical, character, and factor variables to numeric variables.
+
+```{r, warning = FALSE, results = "hide"}
 as.numeric(pull(prob1_df, samp_gt_10))
 as.numeric(pull(prob1_df, char_vec))
 as.numeric(pull(prob1_df, factor_vec))
 ```
 
-```{r}
+Conclusion: The logical and factor variables can be converted to numeric variables, while the character variables cannot.  
+
+Convert variable's type and multiply the random sample by the result.  
+The warning will not be displayed.
+
+```{r, warning = FALSE}
 as.numeric(pull(prob1_df, samp_gt_10)) * pull(prob1_df, samp)
 as.factor(pull(prob1_df, samp_gt_10)) * pull(prob1_df, samp)
 as.numeric(as.factor(pull(prob1_df, samp_gt_10))) * pull(prob1_df, samp)
 ```
 
+Conclusion: I can multiply numbers with numbers but not factors with numbers.
 
 ## Problem 2
+
+Firstly, load the library and penguins dataset.
+
+```{r}
+library("palmerpenguins")
+data("penguins", package = "palmerpenguins")
+```
+
+#### A short description of the penguins data set
+
+* The data set includes `r colnames(penguins)` of penguins.
+* Example values corresponding to variable names showed above: `r head(penguins, 1)`.
+* There are `r nrow(penguins)` rows and `r ncol(penguins)` columns in this data set.
+* The mean of flipper length is `r mean(pull(penguins, flipper_length_mm), na.rm = TRUE)` mm.
+
+#### Scatterplot of flipper_length_mm (y) vs bill_length_mm (x)
+#### The color indicates species
+
+Create a new data frame to collect all information I need,  
+then use ggplot to make a scatterplot.  
+The scatterplot will be saved as a pdf file.
+
+```{r scatterplot, warning = FALSE}
+plot_df = tibble(
+  bill_length = pull(penguins, bill_length_mm),
+  flipper_length = pull(penguins, flipper_length_mm),
+  species = pull(penguins, species))
+
+ggplot(
+  plot_df,
+  aes(x = bill_length, y = flipper_length, color = species)) + geom_point()
+
+ggsave("p8105_hw1_scatter_plot_hq2182.pdf", height = 4, width = 6)
+```
